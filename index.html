@@ -1,1 +1,475 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ekosistem ve Çevre Eğitimi Chatbotu</title>
+  <style>
+    :root {
+      --bg: #f3f7f2;
+      --card: #ffffff;
+      --primary: #2e7d32;
+      --primary-dark: #1b5e20;
+      --accent: #81c784;
+      --text: #1f2933;
+      --muted: #64748b;
+      --bot: #eef8ee;
+      --user: #e8f0fe;
+      --danger: #b91c1c;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #eef8ee, #e3f2fd);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 980px;
+      height: 92vh;
+      background: var(--card);
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.14);
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+    }
+
+    .sidebar {
+      background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+      color: white;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+    }
+
+    .sidebar h1 {
+      font-size: 24px;
+      line-height: 1.2;
+      margin: 0;
+    }
+
+    .sidebar p {
+      margin: 0;
+      line-height: 1.5;
+      color: #e8f5e9;
+      font-size: 14px;
+    }
+
+    .topic-list {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .topic-btn {
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.12);
+      color: white;
+      padding: 10px 12px;
+      border-radius: 14px;
+      text-align: left;
+      cursor: pointer;
+      font-size: 13px;
+      transition: 0.2s;
+    }
+
+    .topic-btn:hover {
+      background: rgba(255, 255, 255, 0.22);
+      transform: translateY(-1px);
+    }
+
+    .note {
+      margin-top: auto;
+      font-size: 12px;
+      color: #d9fdd3;
+      border-top: 1px solid rgba(255,255,255,0.25);
+      padding-top: 14px;
+    }
+
+    .chat-area {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .header {
+      padding: 18px 22px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .header strong {
+      font-size: 18px;
+    }
+
+    .status {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 22px;
+      background: #fbfdfb;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .message {
+      max-width: 78%;
+      padding: 14px 16px;
+      border-radius: 18px;
+      line-height: 1.55;
+      font-size: 15px;
+      white-space: pre-wrap;
+      animation: fadeIn 0.18s ease-in;
+    }
+
+    .bot {
+      align-self: flex-start;
+      background: var(--bot);
+      border: 1px solid #d8efd8;
+      border-bottom-left-radius: 6px;
+    }
+
+    .user {
+      align-self: flex-end;
+      background: var(--user);
+      border: 1px solid #d8e7ff;
+      border-bottom-right-radius: 6px;
+    }
+
+    .message small {
+      display: block;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    .input-area {
+      padding: 16px;
+      border-top: 1px solid #e5e7eb;
+      background: white;
+      display: flex;
+      gap: 10px;
+    }
+
+    textarea {
+      flex: 1;
+      resize: none;
+      min-height: 48px;
+      max-height: 120px;
+      padding: 13px 14px;
+      border-radius: 16px;
+      border: 1px solid #cbd5e1;
+      font-size: 15px;
+      outline: none;
+      font-family: inherit;
+    }
+
+    textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.12);
+    }
+
+    button.send {
+      width: 108px;
+      border: none;
+      border-radius: 16px;
+      background: var(--primary);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 15px;
+      transition: 0.2s;
+    }
+
+    button.send:hover {
+      background: var(--primary-dark);
+    }
+
+    button.send:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .warning {
+      color: var(--danger);
+      font-size: 12px;
+      padding: 0 18px 12px;
+      background: white;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 760px) {
+      body {
+        padding: 0;
+      }
+
+      .app {
+        height: 100vh;
+        border-radius: 0;
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .message {
+        max-width: 92%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <aside class="sidebar">
+      <div class="logo">🌿</div>
+      <h1>Ekosistem ve Çevre Eğitimi Chatbotu</h1>
+      <p>9. ve 10. sınıf biyoloji kazanımlarına uygun, öğrencilerle ekosistem, madde döngüleri, enerji akışı, çevre sorunları ve sürdürülebilirlik üzerine sohbet eden eğitim destekli chatbot.</p>
+
+      <div class="topic-list">
+        <button class="topic-btn" onclick="quickAsk('Ekosistem nedir? 9. sınıf düzeyinde açıklar mısın?')">Ekosistem nedir?</button>
+        <button class="topic-btn" onclick="quickAsk('Besin zinciri ve besin ağı arasındaki fark nedir?')">Besin zinciri / besin ağı</button>
+        <button class="topic-btn" onclick="quickAsk('Karbon döngüsünü örneklerle açıklar mısın?')">Karbon döngüsü</button>
+        <button class="topic-btn" onclick="quickAsk('Biyoçeşitlilik neden önemlidir?')">Biyoçeşitlilik</button>
+        <button class="topic-btn" onclick="quickAsk('İklim değişikliğinin ekosistemlere etkisi nedir?')">İklim değişikliği</button>
+      </div>
+
+      <div class="note">
+        Öğretmen notu: Bu sayfa tek dosya olarak GitHub Pages üzerinde çalışır. Gerçek yapay zekâ yanıtları için güvenli bir sunucu/API endpoint bağlantısı önerilir.
+      </div>
+    </aside>
+
+    <section class="chat-area">
+      <div class="header">
+        <div>
+          <strong>BioBot 🌱</strong><br />
+          <span class="status" id="status">Hazır · 9-10. sınıf biyoloji destek modu</span>
+        </div>
+        <button class="topic-btn" style="color:#1f2933; border-color:#d1d5db; background:#f8fafc;" onclick="clearChat()">Sohbeti Temizle</button>
+      </div>
+
+      <div class="messages" id="messages"></div>
+
+      <div class="input-area">
+        <textarea id="userInput" placeholder="Örneğin: Ekosistemde üretici, tüketici ve ayrıştırıcıların görevleri nelerdir?" onkeydown="handleKey(event)"></textarea>
+        <button class="send" id="sendBtn" onclick="sendMessage()">Gönder</button>
+      </div>
+      <div class="warning" id="warning"></div>
+    </section>
+  </main>
+
+  <script>
+    /*
+      ÖNEMLİ GÜVENLİK NOTU
+      ---------------------
+      OpenAI, Gemini, Claude vb. API anahtarlarını doğrudan bu HTML dosyasına yazmayın.
+      GitHub Pages statik yayın yaptığı için HTML içine yazılan anahtar herkes tarafından görülebilir.
+
+      Güvenli kullanım için:
+      1. Kendi küçük sunucunuzda / serverless function içinde API çağrısı yapın.
+      2. Aşağıdaki AI_ENDPOINT değişkenine kendi güvenli endpoint adresinizi yazın.
+      3. Endpoint şu formatta JSON döndürmelidir: { "answer": "..." }
+    */
+
+    const AI_ENDPOINT = "";
+
+    const SYSTEM_PROMPT = `Sen 9. ve 10. sınıf biyoloji müfredatına uygun bir eğitim chatbotusun.
+Konu alanın: ekosistem, çevre eğitimi, ekoloji, besin zinciri, besin ağı, enerji akışı, madde döngüleri, karbon döngüsü, azot döngüsü, su döngüsü, biyoçeşitlilik, habitat, popülasyon, komünite, ekolojik ayak izi, sürdürülebilirlik, çevre kirliliği, iklim değişikliği ve doğal kaynakların korunmasıdır.
+Yanıtların öğrenci dostu, açık, kısa paragraflı ve örnekli olsun.
+Yanıt verirken mümkün olduğunda:
+- Kavramı tanımla.
+- Günlük yaşamdan örnek ver.
+- 9-10. sınıf düzeyini aşan ayrıntılara girme.
+- Öğrenciyi düşündüren bir küçük soru ile bitir.
+Yanlış bilgi verme. Emin olmadığın noktalarda öğretmene veya ders kitabına danışılmasını öner.`;
+
+    const messagesEl = document.getElementById("messages");
+    const inputEl = document.getElementById("userInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const statusEl = document.getElementById("status");
+    const warningEl = document.getElementById("warning");
+
+    const chatHistory = [];
+
+    const fallbackKnowledge = [
+      {
+        keys: ["ekosistem", "ekolojik sistem"],
+        answer: "Ekosistem, canlı varlıklar ile onların yaşadığı cansız çevrenin birlikte oluşturduğu sistemdir. Bir göl, orman, çayır ya da deniz kıyısı ekosistem olabilir.\n\nEkosistemde üreticiler, tüketiciler ve ayrıştırıcılar birlikte çalışır. Örneğin bitkiler fotosentezle besin üretir, otçullar bitkilerle beslenir, ayrıştırıcılar ölü canlıları parçalayarak maddelerin doğaya dönmesini sağlar.\n\nSence okul bahçesi küçük bir ekosistem olarak incelenebilir mi? Neden?"
+      },
+      {
+        keys: ["besin zinciri", "besin ağı", "üretici", "tüketici"],
+        answer: "Besin zinciri, canlılar arasındaki beslenme ilişkisini tek yönlü olarak gösterir. Örneğin: ot → çekirge → kurbağa → yılan.\n\nBesin ağı ise bir ekosistemdeki birçok besin zincirinin birbirine bağlanmış hâlidir. Doğada canlılar genellikle tek bir canlıyla değil, birden fazla canlıyla beslenme ilişkisi kurar. Bu nedenle besin ağı, gerçek ekosistemleri daha iyi açıklar.\n\nBir canlı ekosistemden çıkarılırsa besin ağında hangi canlılar etkilenebilir?"
+      },
+      {
+        keys: ["karbon", "karbon döngüsü", "fotosentez", "solunum"],
+        answer: "Karbon döngüsü, karbon elementinin canlılar, atmosfer, toprak ve su arasında dolaşmasıdır. Bitkiler fotosentez yaparken atmosferdeki karbondioksiti kullanır. Canlılar solunum yaparken tekrar karbondioksit verir.\n\nFosil yakıtların yakılması atmosferdeki karbondioksit miktarını artırabilir. Bu durum iklim değişikliğiyle ilişkilidir.\n\nGünlük yaşamda karbon salımını azaltmak için hangi davranışlar yapılabilir?"
+      },
+      {
+        keys: ["azot", "azot döngüsü"],
+        answer: "Azot döngüsü, azotun atmosfer, toprak ve canlılar arasında dolaşmasıdır. Atmosferde çok fazla azot gazı bulunur; ancak canlılar bu azotu doğrudan kullanamaz. Bazı bakteriler azotu bitkilerin kullanabileceği bileşiklere dönüştürür.\n\nBitkiler azotlu bileşikleri kullanır, hayvanlar da bitkilerle veya diğer canlılarla beslenerek azotu vücutlarına alır. Ayrıştırıcılar ölü canlıları parçalayarak azotun toprağa dönmesine yardım eder.\n\nTopraktaki bakteriler olmasaydı bitkiler nasıl etkilenirdi?"
+      },
+      {
+        keys: ["su döngüsü", "buharlaşma", "yoğuşma", "yağış"],
+        answer: "Su döngüsü, suyun yeryüzü ve atmosfer arasında sürekli hareket etmesidir. Su; buharlaşma ile atmosfere çıkar, yoğuşma ile bulutları oluşturur, yağışla tekrar yeryüzüne döner.\n\nCanlıların yaşaması için su döngüsü çok önemlidir. Kuraklık, ormanların azalması ve iklim değişikliği bu döngüyü etkileyebilir.\n\nSu kaynaklarını korumak için evde veya okulda neler yapılabilir?"
+      },
+      {
+        keys: ["biyoçeşitlilik", "biyolojik çeşitlilik"],
+        answer: "Biyoçeşitlilik, bir bölgede yaşayan canlı türlerinin çeşitliliğidir. Bitkiler, hayvanlar, mantarlar, mikroorganizmalar ve bunların genetik farklılıkları biyoçeşitliliğin parçasıdır.\n\nBiyoçeşitlilik ekosistemlerin dengeli ve dayanıklı olmasına katkı sağlar. Örneğin farklı bitki türleri, farklı hayvanlara besin ve barınak sağlayabilir.\n\nBir ormanda tek bir ağaç türü kalırsa bu ekosistem nasıl etkilenebilir?"
+      },
+      {
+        keys: ["iklim", "iklim değişikliği", "küresel ısınma"],
+        answer: "İklim değişikliği, sıcaklık, yağış ve hava olaylarında uzun süreli değişimler yaşanmasıdır. Küresel ısınma, iklim değişikliğinin en önemli nedenlerinden biridir ve atmosferde sera gazlarının artmasıyla ilişkilidir.\n\nİklim değişikliği; canlıların yaşam alanlarını, göç yollarını, besin bulma süreçlerini ve su kaynaklarını etkileyebilir.\n\nSence iklim değişikliği en çok hangi canlıları etkiler? Neden?"
+      },
+      {
+        keys: ["çevre kirliliği", "kirlilik", "plastik", "atık"],
+        answer: "Çevre kirliliği; hava, su ve toprağın canlı yaşamını olumsuz etkileyecek şekilde kirlenmesidir. Plastik atıklar, egzoz gazları, fabrika atıkları ve bilinçsiz kimyasal kullanımı çevre kirliliğine örnek olabilir.\n\nKirlilik ekosistemdeki canlıların sağlığını, beslenme ilişkilerini ve yaşam alanlarını bozabilir.\n\nOkulda atık miktarını azaltmak için nasıl bir kampanya düzenlenebilir?"
+      },
+      {
+        keys: ["sürdürülebilirlik", "sürdürülebilir", "doğal kaynak"],
+        answer: "Sürdürülebilirlik, doğal kaynakları bugünün ihtiyaçlarını karşılarken gelecek nesillerin ihtiyaçlarını da düşünerek kullanmaktır. Su, toprak, ormanlar ve enerji kaynakları bilinçli kullanılmalıdır.\n\nGeri dönüşüm yapmak, enerji tasarrufu sağlamak, suyu boşa harcamamak ve doğaya zarar vermeyen ürünleri tercih etmek sürdürülebilir davranışlara örnektir.\n\nGünlük yaşamında sürdürülebilirlik için hangi alışkanlığı değiştirebilirsin?"
+      }
+    ];
+
+    function addMessage(role, text) {
+      const div = document.createElement("div");
+      div.className = `message ${role}`;
+      div.innerHTML = `<small>${role === "bot" ? "BioBot" : "Sen"}</small>${escapeHTML(text)}`;
+      messagesEl.appendChild(div);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function escapeHTML(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\n/g, "<br>");
+    }
+
+    function handleKey(event) {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+      }
+    }
+
+    function quickAsk(text) {
+      inputEl.value = text;
+      sendMessage();
+    }
+
+    function clearChat() {
+      chatHistory.length = 0;
+      messagesEl.innerHTML = "";
+      warningEl.textContent = "";
+      welcome();
+    }
+
+    async function sendMessage() {
+      const userText = inputEl.value.trim();
+      if (!userText) return;
+
+      addMessage("user", userText);
+      chatHistory.push({ role: "user", content: userText });
+      inputEl.value = "";
+      sendBtn.disabled = true;
+      statusEl.textContent = "Yanıt hazırlanıyor...";
+
+      try {
+        let answer;
+
+        if (AI_ENDPOINT) {
+          answer = await askAI(userText);
+        } else {
+          answer = fallbackAnswer(userText);
+          warningEl.textContent = "Not: Şu anda yerel eğitim modu çalışıyor. Gerçek yapay zekâ yanıtları için güvenli AI_ENDPOINT bağlantısı eklenmelidir.";
+        }
+
+        addMessage("bot", answer);
+        chatHistory.push({ role: "assistant", content: answer });
+      } catch (error) {
+        addMessage("bot", "Üzgünüm, şu anda yapay zekâ servisine bağlanamadım. İstersen sorunu daha kısa yazarak tekrar deneyebilirsin.");
+        console.error(error);
+      } finally {
+        sendBtn.disabled = false;
+        statusEl.textContent = "Hazır · 9-10. sınıf biyoloji destek modu";
+        inputEl.focus();
+      }
+    }
+
+    async function askAI(userText) {
+      const response = await fetch(AI_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          system: SYSTEM_PROMPT,
+          message: userText,
+          history: chatHistory.slice(-8)
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("AI endpoint yanıt vermedi.");
+      }
+
+      const data = await response.json();
+      return data.answer || "Yanıt alınamadı.";
+    }
+
+    function fallbackAnswer(userText) {
+      const text = userText.toLowerCase("tr-TR");
+      const found = fallbackKnowledge.find(item => item.keys.some(key => text.includes(key)));
+
+      if (found) return found.answer;
+
+      return "Bu soru ekosistem ve çevre eğitimiyle ilgili görünüyor. 9-10. sınıf düzeyinde şöyle düşünebiliriz:\n\nEkosistemlerde canlılar ve cansız çevre sürekli etkileşim hâlindedir. Bir canlı türündeki değişim, besin ilişkilerini, madde döngülerini ve yaşam alanlarını etkileyebilir. Çevreyi korumak için biyoçeşitliliği, doğal kaynakları ve ekolojik dengeyi birlikte düşünmek gerekir.\n\nSorunu biraz daha belirli yazarsan sana daha hedefli açıklayabilirim. Örneğin “azot döngüsü”, “besin ağı”, “sera etkisi” veya “biyoçeşitlilik” gibi bir kavram sorabilirsin.";
+    }
+
+    function welcome() {
+      addMessage("bot", "Merhaba! Ben EduBot 🌱\n\n9. ve 10. sınıf biyoloji düzeyinde ekosistem ve çevre eğitimi konularında yardımcı olabilirim. Bana ekosistem, besin zinciri, madde döngüleri, biyoçeşitlilik, çevre kirliliği, iklim değişikliği veya sürdürülebilirlik hakkında soru sorabilirsin.");
+    }
+
+    welcome();
+  </script>
+</body>
+</html>
 
